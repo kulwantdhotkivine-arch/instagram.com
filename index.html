@@ -1,147 +1,95 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Instagram Clone</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game</title>
   <style>
-    body{
-      margin:0;
-      font-family: Arial, sans-serif;
-      background:#fafafa;
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: black;
+      margin: 0;
     }
-
-    .header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:15px;
-      background:white;
-      border-bottom:1px solid #ddd;
-      position:sticky;
-      top:0;
+    canvas {
+      background: #111;
+      border: 2px solid lime;
     }
-
-    .logo{
-      font-weight:bold;
-      font-size:20px;
-    }
-
-    .icons{
-      font-size:20px;
-    }
-
-    .story-section{
-      display:flex;
-      overflow-x:auto;
-      padding:10px;
-      background:white;
-      border-bottom:1px solid #ddd;
-    }
-
-    .story{
-      text-align:center;
-      margin-right:10px;
-    }
-
-    .story img{
-      width:60px;
-      height:60px;
-      border-radius:50%;
-      border:2px solid #ff004f;
-    }
-
-    .post{
-      background:white;
-      margin-top:10px;
-      border-top:1px solid #ddd;
-      border-bottom:1px solid #ddd;
-    }
-
-    .post-header{
-      display:flex;
-      align-items:center;
-      padding:10px;
-    }
-
-    .post-header img{
-      width:35px;
-      height:35px;
-      border-radius:50%;
-      margin-right:10px;
-    }
-
-    .post img{
-      width:100%;
-    }
-
-    .post-actions{
-      padding:10px;
-      font-size:20px;
-    }
-
-    .bottom-nav{
-      position:fixed;
-      bottom:0;
-      width:100%;
-      background:white;
-      display:flex;
-      justify-content:space-around;
-      padding:10px 0;
-      border-top:1px solid #ddd;
-      font-size:22px;
-    }
-
   </style>
 </head>
-
 <body>
 
-  <div class="header">
-    <div class="logo">Instagram</div>
-    <div class="icons">❤️ ✉️</div>
-  </div>
+<canvas id="game" width="400" height="400"></canvas>
 
-  <div class="story-section">
-    <div class="story">
-      <img src="https://i.pravatar.cc/100?img=1">
-      <div>You</div>
-    </div>
-    <div class="story">
-      <img src="https://i.pravatar.cc/100?img=2">
-      <div>Rahul</div>
-    </div>
-    <div class="story">
-      <img src="https://i.pravatar.cc/100?img=3">
-      <div>Aman</div>
-    </div>
-  </div>
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
 
-  <div class="post">
-    <div class="post-header">
-      <img src="https://i.pravatar.cc/100?img=4">
-      <b>rahul_123</b>
-    </div>
-    <img src="https://picsum.photos/500/400">
-    <div class="post-actions">
-      ❤️ 💬 📤
-    </div>
-  </div>
+const box = 20;
+let snake = [{x: 200, y: 200}];
+let direction = "RIGHT";
 
-  <div class="post">
-    <div class="post-header">
-      <img src="https://i.pravatar.cc/100?img=5">
-      <b>aman_official</b>
-    </div>
-    <img src="https://picsum.photos/500/401">
-    <div class="post-actions">
-      ❤️ 💬 📤
-    </div>
-  </div>
+let food = {
+  x: Math.floor(Math.random()*20)*box,
+  y: Math.floor(Math.random()*20)*box
+};
 
-  <div class="bottom-nav">
-    🏠 🔍 ➕ ❤️ 👤
-  </div>
+document.addEventListener("keydown", changeDirection);
+
+function changeDirection(event) {
+  if (event.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+  if (event.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+  if (event.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+  if (event.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+}
+
+function draw() {
+  ctx.clearRect(0, 0, 400, 400);
+
+  // Draw Snake
+  snake.forEach((part, index) => {
+    ctx.fillStyle = index === 0 ? "lime" : "green";
+    ctx.fillRect(part.x, part.y, box, box);
+  });
+
+  // Draw Food
+  ctx.fillStyle = "red";
+  ctx.fillRect(food.x, food.y, box, box);
+
+  let headX = snake[0].x;
+  let headY = snake[0].y;
+
+  if (direction === "LEFT") headX -= box;
+  if (direction === "UP") headY -= box;
+  if (direction === "RIGHT") headX += box;
+  if (direction === "DOWN") headY += box;
+
+  // Game Over
+  if (
+    headX < 0 || headY < 0 ||
+    headX >= 400 || headY >= 400 ||
+    snake.some(part => part.x === headX && part.y === headY)
+  ) {
+    alert("Game Over!");
+    document.location.reload();
+  }
+
+  let newHead = {x: headX, y: headY};
+
+  if (headX === food.x && headY === food.y) {
+    food = {
+      x: Math.floor(Math.random()*20)*box,
+      y: Math.floor(Math.random()*20)*box
+    };
+  } else {
+    snake.pop();
+  }
+
+  snake.unshift(newHead);
+}
+
+setInterval(draw, 150);
+</script>
 
 </body>
 </html>
